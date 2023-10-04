@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+//! Dummy message
+message Empty {}
+
+//! Stores all the information for an item
+message ItemData
+{
+	//! The inventory ID of the item
+	uint32 id = 1;
+
+	//! The display name
+	string name = 2;
+
+	//! The unit cost
+	float price = 3;
+}
+
+//! Associates the items to the stored quantity
+message QuantityData
+{
+	//! The ID of the item
+	uint32 id = 1;
+
+	//! The quantity in stock
+	float quantity = 2;
+}
+
+//! Response after trying to create new item
+message NewItemResponse
+{
+	//! The ID of the new item allocated by the server
+	uint32 new_id = 1;
+}
+
+//! Asks the server to delete an item
+message DeleteItemRequest
+{
+	//! The ID of the item to be deleted
+	uint32 delete_id = 1;
+}
+
+//! Message returned when reading list of items
+message ItemQueryResponse
+{
+	repeated ItemData items = 1;
+}
+
+//! Describes the services provided by the inventory server
+service InventoryService
+{
+	//! Adds a new item to the inventory
+	rpc CreateItem(Empty) returns (NewItemResponse) {}
+
+	//! Deletes an item from the inventory
+	rpc DeleteItem(DeleteItemRequest) returns (Empty) {}
+
+	//! Modifies the data of the item
+	rpc ModifyItem(ItemData) returns (Empty) {}
+
+	//! Reads a list of all items
+	rpc QueryItems(Empty) returns (ItemQueryResponse) {}
+
+	//! Receives live updates of the available quantities in stock
+	rpc SubscribeQuantities(Empty) returns (stream QuantityData) {}
+
+	//! Increments / decrements the quantity of the item in the server
+	rpc ModifyQuantities(QuantityData) returns (Empty) {}
+}

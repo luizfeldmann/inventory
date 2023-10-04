@@ -1,0 +1,7 @@
+{
+  "name": "Inventory",
+  "version": "1.0.0.0",
+  "homepage": "https://github.com/luizfeldmann/inventory",
+  "author": "Luiz Feldmann",
+  "description": "Example inventory server using gRPC"
+}
