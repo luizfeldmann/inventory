@@ -1,8 +1,5 @@
 # Exports the protobuffer + gRPC
 
-find_package(protobuf REQUIRED)
-find_package(grpc REQUIRED)
-
 # Create the ICD target
 set(ICD_NAME "InventoryAPI")
 set(ICD_INPUT_FILE "${CMAKE_CURRENT_LIST_DIR}/${ICD_NAME}.proto")

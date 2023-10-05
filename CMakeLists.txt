@@ -26,6 +26,11 @@ ENDIF()
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/build/generators")
 
 # Depend: grpc
+find_package(protobuf REQUIRED)
+find_package(grpc REQUIRED)
+
+# Depend: cxxops
+find_package(cxxopts)
 
 # Create ICD library
 add_subdirectory("resources/proto")

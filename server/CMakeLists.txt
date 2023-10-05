@@ -7,9 +7,17 @@ add_executable(${CMAKE_TARGET_NAME}
     ${RESOURCESFILE}
     # Sources
     "src/main.cpp"
+    "src/CInventoryServer.cpp"
     # Includes
-    )
+    "include/CInventoryServer.h" )
 
 target_include_directories(${CMAKE_TARGET_NAME} PRIVATE "include")
 
-target_link_libraries(${CMAKE_TARGET_NAME} PRIVATE InventoryAPI)
+# Add depends
+find_package(ensurethread)
+
+target_link_libraries(${CMAKE_TARGET_NAME} PRIVATE 
+    grpc::grpc
+    cxxopts::cxxopts
+    ensurethread::ensurethread
+    InventoryAPI )

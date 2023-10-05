@@ -8,8 +8,10 @@ class Recipe(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     
     def requirements(self):
+        self.requires("ensurethread/[>=0.0.0.0]")
         self.requires("grpc/[~1.54]")
-        
+        self.requires("cxxopts/[~3.1.1]", visible=False)
+
     def layout(self):
         cmake_layout(self)
         
