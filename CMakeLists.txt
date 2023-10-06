@@ -38,3 +38,11 @@ add_subdirectory("resources/proto")
 # Create app targets
 add_subdirectory("client")
 add_subdirectory("server")
+
+# Install
+include(GNUInstallDirs)
+
+install(TARGETS 
+    ${CMAKE_PROJECT_NAME}_client
+    ${CMAKE_PROJECT_NAME}_server
+    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
