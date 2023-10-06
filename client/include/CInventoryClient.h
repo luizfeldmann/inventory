@@ -21,8 +21,8 @@ public:
 
     grpc::Status Create(uint32_t& uNewId);
     grpc::Status Delete(uint32_t uId);
-    grpc::Status Modify(uint32_t uId, const std::string& sNewName, double dNewPrice);
-    grpc::Status Update(uint32_t uId, double dDeltaQuant);
+    grpc::Status Update(uint32_t uId, const char* sNewName, const float* dNewPrice, const float* dNewQuantity);
+    grpc::Status Observe();
 };
 
 #endif

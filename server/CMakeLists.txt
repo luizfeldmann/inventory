@@ -13,6 +13,10 @@ add_executable(${CMAKE_TARGET_NAME}
 
 target_include_directories(${CMAKE_TARGET_NAME} PRIVATE "include")
 
+set_target_properties(${CMAKE_TARGET_NAME}
+    PROPERTIES
+    CXX_STANDARD 17)
+
 # Add depends
 find_package(ensurethread)
 

@@ -10,17 +10,17 @@ int main(int argc, const char* const* argv)
         bHelp = false,
         bCreate = false,
         bDelete = false,
-        bModify = false,
-        bUpdate = false;
+        bUpdate = false,
+        bObserve = false;
 
     // Connection info
     std::string sHost = "127.0.0.1";
     uint16_t uPort = 8080;
 
-    uint32_t uId = 0;
-    std::string sName;
-    double dQuantity = .0;
-    double dPrice = .0;
+    uint32_t uId = 0;       //!< The ID of the item passed via CLI
+    std::string sName;      //!< The name of the item passed via CLI
+    float fQuantity = .0;   //!< The quantity of the item passed via CLI
+    float fPrice = .0;      //!< The price of the item passed via CLI
 
     // Define the command line
     cxxopts::Options cOps(
@@ -36,8 +36,8 @@ int main(int argc, const char* const* argv)
     cOps.add_options("Commands")
         ("create", "Creates a new item", cxxopts::value<>(bCreate))
         ("delete", "Deletes an item", cxxopts::value<>(bDelete))
-        ("modify", "Modifies the data of an item", cxxopts::value<>(bModify))
-        ("update", "Updates the quantity of an item", cxxopts::value<>(bUpdate))
+        ("update", "Updates the name, price or quantity of an item", cxxopts::value<>(bUpdate))
+        ("observe", "Subscribe to stream of item data", cxxopts::value<>(bObserve))
         ;
 
     static const char
@@ -49,8 +49,8 @@ int main(int argc, const char* const* argv)
     cOps.add_options("Parameters")
         (szParId, "", cxxopts::value<>(uId))
         (szParName, "", cxxopts::value<>(sName))
-        (szParQuant, "", cxxopts::value<>(dQuantity))
-        (szParPrice, "", cxxopts::value<>(dPrice))
+        (szParQuant, "", cxxopts::value<>(fQuantity))
+        (szParPrice, "", cxxopts::value<>(fPrice))
         ;
 
     // Parse the command line
@@ -74,8 +74,7 @@ int main(int argc, const char* const* argv)
 
     bCreate = bCreate && !bDelete && !bHasId;
     bDelete = bDelete && !bCreate && bHasId;
-    bModify = bModify && !bDelete && (bHasId || bCreate) && bHasName && bHasPrice;
-    bUpdate = bUpdate && !bDelete && (bHasId || bCreate) && bHasQuant;
+    bUpdate = ((bUpdate && bHasId) || (bCreate)) && (bHasQuant || bHasPrice || bHasName);
 
     // Print help
     if (bHelp)
@@ -95,15 +94,22 @@ int main(int argc, const char* const* argv)
             Status = cClient.Create(uId);
             std::cout << uId << std::endl;
         }
-
-        if (bDelete)
+        else if (bDelete)
+        {
             Status = cClient.Delete(uId);
+        }
 
-        if (bModify)
-            Status = cClient.Modify(uId, sName, dPrice);
+        if (Status.ok() && bUpdate)
+        {
+            Status = cClient.Update(uId,
+                bHasName ? sName.c_str() : nullptr,
+                bHasPrice ? &fPrice : nullptr,
+                bHasQuant ? &fQuantity : nullptr
+            );
+        }
 
-        if (bUpdate)
-            Status = cClient.Update(uId, dQuantity);
+        if (bObserve)
+            Status = cClient.Observe();
 
         // Print possible error
         if (!Status.ok())

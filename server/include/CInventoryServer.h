@@ -6,6 +6,21 @@
 #include <InventoryAPI.pb.h>
 #include <InventoryAPI.grpc.pb.h>
 
+//! Manages a collection of subscribers
+struct SSubscriberList
+{
+private:
+    std::mutex m_mxSubscribers;
+    std::deque<std::promise<ItemData>> m_subscribers;
+
+public:
+    //! Notify observers of some change
+    void notify_all(const ItemData& item);
+
+    //! Gets a future which will be notified when changes occur
+    std::future<ItemData> get_future();
+};
+
 //! Server wrapper for the service
 class CInventoryServer : InventoryService::CallbackService
 {
@@ -22,6 +37,12 @@ private:
     //! The full database of items
     DataBase m_dataBase;
 
+    //! Collection of observers
+    SSubscriberList m_subscribers;
+
+    //! @brief Saves the database to disk
+    void Save();
+
     //! @name Implementation of generated API
     //! @{
     
@@ -31,11 +52,7 @@ private:
 
     ::grpc::ServerUnaryReactor* ModifyItem(::grpc::CallbackServerContext* context, const ::ItemData* request, ::Empty* response) override;
 
-    ::grpc::ServerWriteReactor<::ItemData>* SubscribeItems(::grpc::CallbackServerContext* context, const ::Empty* request) override;
-
-    ::grpc::ServerWriteReactor<::QuantityData>* SubscribeQuantities(::grpc::CallbackServerContext* context, const ::Empty* request) override;
-
-    ::grpc::ServerUnaryReactor* ModifyQuantities(::grpc::CallbackServerContext* context, const ::QuantityData* request, ::Empty* response) override;
+    ::grpc::ServerWriteReactor<::ItemData>* Subscribe(::grpc::CallbackServerContext* context, const ::Empty* request) override;
 
     //! @}
 

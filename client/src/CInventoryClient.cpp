@@ -1,4 +1,5 @@
 #include "CInventoryClient.h"
+#include <iomanip>
 
 CInventoryClient::CInventoryClient(const std::string& sChannel)
     : m_pChannel(grpc::CreateChannel(sChannel, grpc::InsecureChannelCredentials()))
@@ -36,29 +37,50 @@ grpc::Status CInventoryClient::Delete(uint32_t uId)
     return m_pStub->DeleteItem(&Ctx, request, &response);
 }
 
-grpc::Status CInventoryClient::Modify(uint32_t uId, const std::string& sNewName, double dNewPrice)
+grpc::Status CInventoryClient::Update(uint32_t uId, const char* pNewName, const float* pNewPrice, const float* pNewQuantity)
 {
     grpc::ClientContext Ctx;
 
     ItemData request;
     request.set_id(uId);
-    request.set_name(sNewName);
-    request.set_price(dNewPrice);
+
+    if (pNewName)
+        request.set_name(pNewName);
+
+    if (pNewPrice)
+        request.set_price(*pNewPrice);
+
+    if (pNewQuantity)
+        request.set_quantity(*pNewQuantity);
 
     Empty response;
 
     return m_pStub->ModifyItem(&Ctx, request, &response);
 }
 
-grpc::Status CInventoryClient::Update(uint32_t uId, double dDeltaQuant)
+//! Prints one row of items
+static void printRow(const ItemData& item)
+{
+    std::cout 
+        << std::setw(5) << item.id() << "\t"
+        << std::setw(10) << (item.has_name() ? item.name() : "") << "\t"
+        << std::setw(15) << (item.has_price() ? std::to_string(item.price()) : "-") << "\t"
+        << std::setw(15) << (item.has_quantity() ? std::to_string(item.quantity()) : "-") << "\t"
+        << std::endl;
+}
+
+grpc::Status CInventoryClient::Observe()
 {
     grpc::ClientContext Ctx;
 
-    QuantityData request;
-    request.set_id(uId);
-    request.set_quantity(dDeltaQuant);
+    Empty request;
+    auto pWriter = m_pStub->Subscribe(&Ctx, request);
 
-    Empty response;
+    ItemData response;
+    while (pWriter->Read(&response))
+    {
+        printRow(response);
+    }
 
-    return m_pStub->ModifyQuantities(&Ctx, request, &response);
+    return pWriter->Finish();
 }

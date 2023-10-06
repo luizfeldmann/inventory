@@ -10,20 +10,13 @@ message ItemData
 	uint32 id = 1;
 
 	//! The display name
-	string name = 2;
+	optional string name = 2;
 
 	//! The unit cost
-	float price = 3;
-}
+	optional float price = 3;
 
-//! Associates the items to the stored quantity
-message QuantityData
-{
-	//! The ID of the item
-	uint32 id = 1;
-
-	//! The quantity in stock
-	float quantity = 2;
+	//! Quantity of the item in stock
+	optional float quantity = 4;
 }
 
 //! Response after trying to create new item
@@ -53,33 +46,11 @@ service InventoryService
 	rpc ModifyItem(ItemData) returns (Empty) {}
 
 	//! Reads a list of all items
-	rpc SubscribeItems(Empty) returns (stream ItemData) {}
-
-	//! Receives live updates of the available quantities in stock
-	rpc SubscribeQuantities(Empty) returns (stream QuantityData) {}
-
-	//! Increments / decrements the quantity of the item in the server
-	rpc ModifyQuantities(QuantityData) returns (Empty) {}
-}
-
-//! Each row in the database
-message DatabaseRow
-{
-	//! The ID of the item
-	uint32 id = 1;
-
-	//! The display name
-	string name = 2;
-
-	//! The unit cost
-	float price = 3;
-
-	//! The quantity in stock
-	float quantity = 4;
+	rpc Subscribe(Empty) returns (stream ItemData) {}
 }
 
 // The full database
 message DataBase
 {
-	repeated DatabaseRow Items = 1;
+	repeated ItemData Items = 1;
 }
