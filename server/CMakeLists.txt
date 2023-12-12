@@ -21,7 +21,6 @@ set_target_properties(${CMAKE_TARGET_NAME}
 find_package(ensurethread)
 
 target_link_libraries(${CMAKE_TARGET_NAME} PRIVATE 
-    grpc::grpc
     cxxopts::cxxopts
     ensurethread::ensurethread
     InventoryAPI )

@@ -15,5 +15,4 @@ target_include_directories(${CMAKE_TARGET_NAME} PRIVATE "include")
 
 target_link_libraries(${CMAKE_TARGET_NAME} PRIVATE 
     cxxopts::cxxopts
-    grpc::grpc
     InventoryAPI )

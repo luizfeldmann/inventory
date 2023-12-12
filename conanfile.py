@@ -1,4 +1,5 @@
 from conan import ConanFile
+from conan.tools.build import can_run
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 import os, shutil, json
 
@@ -9,8 +10,12 @@ class Recipe(ConanFile):
     
     def requirements(self):
         self.requires("ensurethread/[>=0.0.0.0]")
-        self.requires("grpc/[~1.54]")
+        self.requires("grpc/[~1.54]", run=can_run(self))
         self.requires("cxxopts/[~3.1.1]", visible=False)
+
+    def build_requirements(self):
+        # For compiling the .proto in cross-builds
+        self.tool_requires("grpc/<host_version>")
 
     def layout(self):
         cmake_layout(self)

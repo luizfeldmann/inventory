@@ -1,7 +1,16 @@
 #include <iostream>
+#include <csignal>
 #include <cxxopts.hpp>
-#include <conio.h>
 #include "CInventoryServer.h"
+
+//! Flag indicating a stop signal was handled
+volatile std::sig_atomic_t g_sigStop;
+
+//! Handler invoked when the installed std::signal is received
+static void signalHandler(int signum)
+{
+    g_sigStop = signum;
+}
 
 //! Entry-point for the server
 int main(int argc, const char* const* argv)
@@ -47,7 +56,9 @@ int main(int argc, const char* const* argv)
     // Start server
     CInventoryServer cServer(sHost + ":" + std::to_string(uPort));
 
-    while (!_kbhit())
+    std::signal(SIGINT, signalHandler);
+
+    while(!g_sigStop)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         cServer.OnRun();

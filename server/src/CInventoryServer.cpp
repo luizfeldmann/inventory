@@ -5,16 +5,26 @@
 #include <fstream>
 #include <filesystem>
 
+#ifndef _WIN32
+    #include <dlfcn.h>
+#endif
+
 static const char* c_szNotFound = "Item does not exist";
 
 //! @name Utils
 //! @{
 
 //! Reads the path of the database file
-static auto getDatabaseFilePath()
+static std::filesystem::path getDatabaseFilePath()
 {
+#ifdef _WIN32
     char szExePath[MAX_PATH] = { 0 };
     GetModuleFileNameA(NULL, szExePath, sizeof(szExePath));
+#else
+    Dl_info info;
+    dladdr((void*)getDatabaseFilePath, &info);
+    const char* szExePath = info.dli_fname;
+#endif
 
     return std::filesystem::path(szExePath).replace_extension("bin");
 }

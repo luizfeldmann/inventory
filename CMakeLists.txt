@@ -26,8 +26,8 @@ ENDIF()
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/build/generators")
 
 # Depend: grpc
-find_package(protobuf REQUIRED)
-find_package(grpc REQUIRED)
+find_package(protobuf CONFIG REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
 
 # Depend: cxxops
 find_package(cxxopts)
